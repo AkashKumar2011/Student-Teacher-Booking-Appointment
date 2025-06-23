@@ -1,6 +1,6 @@
 // src/components/Student/SearchTeacher.jsx
 import { useState, useEffect } from 'react';
-import { db } from '../../firebase/config';
+import { db } from '../../../firebase/config';
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import { Link } from 'react-router-dom';
 

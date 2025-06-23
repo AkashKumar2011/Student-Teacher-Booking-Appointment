@@ -7,6 +7,7 @@ import { toast } from 'react-hot-toast';
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [role, setRole] = useState('Student'); // Default role
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -16,9 +17,23 @@ export default function Login() {
     
     try {
       setLoading(true);
-      await login(email, password);
+      console,log('Logging in with:', { email, password, role });
+      await login(email, password, role);
+  
       toast.success('Logged in successfully!');
-      navigate('/dashboard');
+      console.log('Login successful, redirecting...');
+
+      // Redirect based on role
+      switch(role) {
+        case 'Admin':
+          navigate('/admindashboard');
+          break;
+        case 'Teacher':
+          navigate('/teacher-dashboard');
+          break;
+        default:
+          navigate('/studentdashboard');
+      }
     } catch (error) {
       toast.error('Failed to login: ' + error.message);
     } finally {
@@ -36,6 +51,23 @@ export default function Login() {
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="rounded-md shadow-sm space-y-4">
+            <div>
+              <label htmlFor="role" className="block text-sm font-medium text-gray-700">
+                Role
+              </label>
+              <select
+                id="role"
+                name="role"
+                required
+                value={role}
+                onChange={(e) => setRole(e.target.value)}
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              >
+                <option value="Student">Student</option>
+                <option value="Teacher">Teacher</option>
+                <option value="Admin">Admin</option>
+              </select>
+            </div>
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700">
                 Email address

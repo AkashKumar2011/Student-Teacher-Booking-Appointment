@@ -1,8 +1,8 @@
 // src/components/Student/BookAppointment.jsx
 import { useState, useEffect } from 'react';
-import { db } from '../../firebase/config';
+import { db } from '../../../firebase/config';
 import { collection, addDoc, query, where, onSnapshot } from 'firebase/firestore';
-import { useAuth } from '../../context/AuthContext'
+import { useAuth } from '../../../context/AuthContext';
 import { toast } from 'react-hot-toast';
 
 export default function BookAppointment({ teacher }) {

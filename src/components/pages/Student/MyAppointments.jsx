@@ -1,8 +1,8 @@
 // src/components/Student/MyAppointments.jsx
 import { useState, useEffect } from 'react';
-import { db } from '../../firebase/config';
+import { db } from '../../../firebase/config';
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '../../../context/AuthContext';
 
 export default function MyAppointments() {
   const { currentUser } = useAuth();

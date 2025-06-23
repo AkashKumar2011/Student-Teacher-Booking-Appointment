@@ -79,8 +79,8 @@ export default function ContactUs() {
             <div className="mt-5">
               <h3 className="text-lg font-medium text-gray-900">Phone</h3>
               <p className="mt-2 text-base text-gray-600">
-                Main: +1 (555) 123-4567<br />
-                Admissions: +1 (555) 123-4568
+                Main: +91-7376422015<br />
+                Admissions: +91-7376422015
               </p>
             </div>
           </div>
@@ -272,7 +272,7 @@ export default function ContactUs() {
                       support@akashuniversity.edu
                     </a>
                     <span className="mx-2 text-gray-400">|</span>
-                    <span className="text-gray-600">+1 (555) 123-4599</span>
+                    <span className="text-gray-600">+91-7376422015</span>
                   </div>
                 </div>
               </div>
@@ -286,15 +286,15 @@ export default function ContactUs() {
           <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
             <div className="bg-white p-4 rounded-md shadow-sm">
               <h3 className="text-lg font-medium text-gray-900">Campus Security</h3>
-              <p className="mt-1 text-red-600 font-semibold">+1 (555) 123-9111</p>
+              <p className="mt-1 text-red-600 font-semibold">+91 7376422015</p>
             </div>
             <div className="bg-white p-4 rounded-md shadow-sm">
               <h3 className="text-lg font-medium text-gray-900">Health Center</h3>
-              <p className="mt-1 text-red-600 font-semibold">+1 (555) 123-9112</p>
+              <p className="mt-1 text-red-600 font-semibold">+91 7376422015</p>
             </div>
             <div className="bg-white p-4 rounded-md shadow-sm">
               <h3 className="text-lg font-medium text-gray-900">Counseling Services</h3>
-              <p className="mt-1 text-red-600 font-semibold">+1 (555) 123-9113</p>
+              <p className="mt-1 text-red-600 font-semibold">+91 7376422015</p>
             </div>
           </div>
         </div>
