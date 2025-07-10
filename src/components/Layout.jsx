@@ -11,7 +11,7 @@ export default function Layout({ children }) {
       {/* Fixed Navbar */}
       <Navbar onMenuClick={() => setSidebarOpen(true)} />
       
-      <div className="flex flex-1 pt-16"> {/* Add padding-top to account for fixed navbar */}
+      <div className="flex flex-1 pt-9"> {/* Add padding-top to account for fixed navbar */}
         {/* Fixed Sidebar */}
         <Sidebar 
           isOpen={sidebarOpen} 

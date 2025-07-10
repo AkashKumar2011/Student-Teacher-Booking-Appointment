@@ -1,86 +1,368 @@
-// src/components/context/AuthContext.jsx
-import { createContext, useContext, useEffect, useState } from 'react';
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  useCallback,
+} from 'react';
 import { auth, db } from '../firebase/config';
-import { 
-  createUserWithEmailAndPassword, 
-  signInWithEmailAndPassword, 
-  signOut, 
-  onAuthStateChanged 
-} from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
 
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  fetchSignInMethodsForEmail,
+  signOut,
+  onAuthStateChanged,
+  sendPasswordResetEmail,
+  sendEmailVerification,
+} from 'firebase/auth';
+
+import {
+  doc,
+  getDoc,
+  setDoc,
+  serverTimestamp,
+} from 'firebase/firestore';
+
+// context/AuthContext.js
+import { getFunctions, httpsCallable } from 'firebase/functions';
+import toast from 'react-hot-toast';
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(null);
-  const [userData, setUserData] = useState(null); // Additional user data from Firestore
+  const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [initialCheckComplete, setInitialCheckComplete] = useState(false);
+  const [departmentFilter, setDepartmentFilter] = useState('');
 
-  async function signup(email, password, role, additionalData = {}) {
+  useEffect(() => {
+    if (error) {
+      const timer = setTimeout(() => setError(null), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [error]);
+
+  const getUserData = useCallback(async (uid) => {
+    const roles = ['students', 'teachers', 'admins'];
+    for (const role of roles) {
+      const userRef = doc(db, role, uid);
+      const userSnap = await getDoc(userRef);
+      if (userSnap.exists()) {
+        const data = userSnap.data();
+        return {
+          ...data,
+          role: role.slice(0, -1),
+          id: uid,
+          emailVerified: data.emailVerified || false,
+        };
+      }
+    }
+    return null;
+  }, []);
+
+  // Register function
+  const register = async (email, password, role, additionalData = {}) => {
     try {
+      setLoading(true);
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      // Add user to appropriate collection based on role
-      const userRef = doc(db, `${role.toLowerCase()}s`, userCredential.user.uid);
+
+      await sendEmailVerification(userCredential.user, {
+        url: `${window.location.origin}/login?email=${encodeURIComponent(email)}`,
+        handleCodeInApp: true
+      });
+
+      const userRef = doc(db, `students`, userCredential.user.uid);
       await setDoc(userRef, {
         ...additionalData,
         email,
-        role,
-        createdAt: new Date()
+        role: role.toLowerCase(),
+        createdAt: new Date(),
+        isActive: true,
+        emailVerified: false,
+        verificationEmailSentAt: new Date(),
       });
-      return userCredential;
+
+      await signOut(auth);
+
+      return {
+        success: true,
+        email,
+        uid: userCredential.user.uid,
+      };
     } catch (error) {
+      let errorMessage = error.message;
+      if (error.code === 'auth/email-already-in-use') {
+        errorMessage = 'This email is already registered. Please login instead.';
+      } else if (error.code === 'auth/weak-password') {
+        errorMessage = 'Password should be at least 6 characters';
+      }
+      setError(errorMessage);
       throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
+
+// admin registration function
+const registerAdmin = async (email, password, additionalData, adminKey) => {
+    try {
+    
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      await sendEmailVerification(user, {
+        url: `${window.location.origin}/login?email=${encodeURIComponent(email)}`,
+        handleCodeInApp: true,
+      });
+
+      const userRef = doc(db, 'admins', user.uid);
+      await setDoc(userRef, {
+        uid: user.uid,
+        email: user.email,
+        firstName: additionalData.firstName,
+        lastName: additionalData.lastName,
+        role: 'admin',
+        adminKey: adminKey,
+        isActive: true,
+        createdAt: serverTimestamp(),
+        emailVerified: false,
+        verificationEmailSentAt: new Date(),
+      });
+
+      return { success: true };
+    } catch (error) {
+      throw new Error(error.message || 'Registration failed');
+    }
+  };
+
+
+
+
+// Teacher registration function - UPDATED VERSION
+const registerTeacher = async (email, password, additionalData) => {
+  try {
+    // First check if email already exists using the imported function
+    const methods = await fetchSignInMethodsForEmail(auth, email);
+    if (methods && methods.length > 0) {
+      throw new Error('auth/email-already-in-use');
+    }
+
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
+
+    await sendEmailVerification(user, {
+      url: `${window.location.origin}/login?email=${encodeURIComponent(email)}`,
+      handleCodeInApp: true,
+    });
+
+    const userRef = doc(db, 'teachers', user.uid);
+    await setDoc(userRef, {
+      uid: user.uid,
+      email: user.email,
+      fullName: additionalData.fullName,
+      mobileNo: additionalData.mobileNo,
+      department: additionalData.department,
+      subjects: additionalData.subjects,
+      teacherId: additionalData.teacherId, // Assuming this is a unique identifier for the teacher
+      loginPassword: additionalData.loginPassword, // Store the login password securely
+      role: 'teacher',
+      isActive: true,
+      createdAt: serverTimestamp(),
+      emailVerified: false,
+      verificationEmailSentAt: new Date(),
+    });
+
+    return { success: true };
+  } catch (error) {
+    console.error('Registration error:', error);
+    // Re-throw the error with proper message
+    if (error.message === 'auth/email-already-in-use') {
+      throw new Error('This email is already registered');
+      toast.error('This email is already registered. Please login instead.');
+    } else {
+      throw new Error(error.message || 'Registration failed');
     }
   }
+};
 
-  async function login(email, password) {
-    return signInWithEmailAndPassword(auth, email, password);
-  }
 
-  function logout() {
-    return signOut(auth);
+
+// login function 
+const login = async (email, password, userRole) => {
+  try {
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
+
+    let role = userRole.toLowerCase();
+    console.log('Role from login:', role);
+
+    let collectionName;
+    if(role === 'admin' ){
+       collectionName = 'admins'; // "admin"
+    }else if(role === 'teacher'){
+       collectionName = 'teachers'; // "teacher", 
+    }else if(role === 'student'){
+       collectionName = 'students'; // "student"
+    }else{
+      throw new Error('Invalid role specified');    
+    }
+
+
+    console.log('User logged in:', user ,role);
+    // const collectionName = 'users'; // Default collection for all roles
+    console.log('Using collection:', collectionName, user.uid , role);
+
+    // Fetch user data from the specified collection
+    const userRef = doc(db, collectionName, user.uid);
+    const userSnap = await getDoc(userRef);
+
+    if (!userSnap.exists()) {
+      throw new Error(`No user data found in ${collectionName} collection`);
+    }
+
+    const fetchedUserData = {
+      ...userSnap.data(),
+      id: user.uid,
+      role: role,
+      emailVerified: user.emailVerified,
+    };
+
+    setCurrentUser(user);
+    setUserData(fetchedUserData);
+    return { user, userData: fetchedUserData };
+  } catch (error) {
+    console.error('Login error:', error);
+    throw error;
   }
+};
+
+
+  //logout function
+  const logout = async () => {
+    try {
+      await signOut(auth);
+      setCurrentUser(null);
+      setUserData(null);
+    } catch (error) {
+      setError(error.message || 'Logout failed');
+      throw error;
+    }
+  };
+
+
+// useEffect(() => {
+//     console.log('[DEBUG] Initializing teacher search...');
+    
+//     const fetchTeachers = async () => {
+//       try {
+//         // First verify database connection
+//         console.log('[DEBUG] Testing database connection...');
+//         const testQuery = query(collection(db, 'teachers'), limit(1));
+//         const testSnapshot = await getDocs(testQuery);
+        
+//         if (testSnapshot.empty) {
+//           console.warn('[WARNING] Teachers collection exists but is empty');
+//         } else {
+//           console.log('[DEBUG] Connection successful, found:', testSnapshot.docs[0].data());
+//         }
+
+//         // Set up the main query
+//         let q;
+//         if (departmentFilter) {
+//           console.log(`[DEBUG] Filtering by department: ${departmentFilter}`);
+//           q = query(
+//             collection(db, 'teachers'),
+//             where('department', '==', departmentFilter)
+//           );
+//         } else {
+//           console.log('[DEBUG] Fetching all teachers');
+//           q = query(collection(db, 'teachers'));
+//         }
+
+//         console.log('[DEBUG] Setting up real-time listener...');
+//         const unsubscribe = onSnapshot(q, 
+//           (snapshot) => {
+//             console.log(`[DEBUG] Received snapshot with ${snapshot.size} documents`);
+            
+//             if (snapshot.empty) {
+//               console.warn('[WARNING] No teachers found matching query');
+//               setError('No teachers found in the database');
+//             } else {
+//               const teachersData = snapshot.docs.map(doc => {
+//                 const data = doc.data();
+//                 console.log(`[DEBUG] Processing teacher ${doc.id}:`, data);
+                
+//                 return {
+//                   id: doc.id,
+//                   name: data.name || 'Unknown Teacher',
+//                   department: data.department || 'No Department',
+//                   subject: data.subject || 'No Subject'
+//                 };
+//               });
+              
+//               setTeachers(teachersData);
+//               setError(null);
+//             }
+//             setLoading(false);
+//           },
+//           (error) => {
+//             console.error('[ERROR] Snapshot error:', error);
+//             setError(`Failed to load teachers: ${error.message}`);
+//             setLoading(false);
+//           }
+//         );
+
+//         return unsubscribe;
+//       } catch (err) {
+//         console.error('[ERROR] Database operation failed:', err);
+//         setError(`Database error: ${err.message}`);
+//         setLoading(false);
+//         return () => {}; // Return empty cleanup function
+//       }
+//     };
+
+//     fetchTeachers();
+//   }, [departmentFilter]);
+
+
+//---------------------------
+
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
-        // Get additional user data from Firestore
-        try {
-          // Check which collection the user is in
-          const roles = ['admins', 'teachers', 'students'];
-          let userData = null;
-          
-          for (const role of roles) {
-            const userRef = doc(db, role, user.uid);
-            const userSnap = await getDoc(userRef);
-            if (userSnap.exists()) {
-              userData = userSnap.data();
-              break;
-            }
-          }
-          
-          setCurrentUser(user);
-          setUserData(userData);
-        } catch (error) {
-          console.error("Error fetching user data:", error);
-        }
+        const fetchedUserData = await getUserData(user.uid);
+        setCurrentUser(user);
+        setUserData(fetchedUserData);
       } else {
         setCurrentUser(null);
         setUserData(null);
       }
+      setInitialCheckComplete(true);
       setLoading(false);
     });
 
     return unsubscribe;
-  }, []);
+  }, [getUserData]);
 
   const value = {
     currentUser,
     userData,
-    signup,
+    register, //signup,
+    registerAdmin, // Added admin registration function   
+    registerTeacher, // Added teacher registration function
     login,
     logout,
-    loading
+    loading,
+    error,
+    setError,
+    initialCheckComplete,
+    setUserData,
+    // collectionName: 'users', // Default collection for all roles
   };
 
   return (

@@ -14,12 +14,12 @@ export function AppProvider({ children }) {
     setCurrentTeacher
   };
 
-  return (
+ return (
     <AppContext.Provider value={value}>
       {children}
     </AppContext.Provider>
   );
-}
+} 
 
 export function useApp() {
   return useContext(AppContext);

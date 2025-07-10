@@ -1,9 +1,9 @@
-// src/components/UI/Toast.jsx
+// src/context/ToastContext.jsx
 import { createContext, useContext, useState } from 'react';
 
 const ToastContext = createContext();
 
-export const ToastProvider = ({ children }) => {
+export function ToastProvider({ children }) {
   const [toast, setToast] = useState(null);
 
   const showToast = (message, type = 'info', duration = 3000) => {
@@ -21,12 +21,12 @@ export const ToastProvider = ({ children }) => {
       )}
     </ToastContext.Provider>
   );
-};
+}
 
-export const useToast = () => {
+export function useToast() {
   const context = useContext(ToastContext);
   if (!context) {
-    throw new Error('useToast must be used within ToastProvider');
+    throw new Error('useToast must be used within a ToastProvider');
   }
   return context;
-};
+}
