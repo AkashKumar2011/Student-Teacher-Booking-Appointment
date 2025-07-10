@@ -52,7 +52,7 @@ The project provides a **real-time scheduling interface** for students and teach
 ---
 ## 🛠️ Modules Interconnect Workflow Diagram
 
-```
+```mermaid
 graph TD
     %% Authentication Flow
     A[Visitor] -->|Access System| B(Login/Signup Page)
