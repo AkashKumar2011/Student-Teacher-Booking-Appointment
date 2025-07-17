@@ -52,8 +52,58 @@ The project provides a **real-time scheduling interface** for students and teach
 ---
 ## 🛠️ Modules Interconnect Workflow Diagram
 
-![Uploading diagram.png…]()
+```mermaid
+graph TD
+    %% Authentication Flow
+    A[Visitor] -->|Access System| B(Login/Signup Page)
+    B --> C{Authentication}
+    C -->|Success| D[Main Router]
+    C -->|Failure| B
+    
+    %% Role-Based Routing
+    D --> E{User Type}
+    E -->|Admin| F[Admin Dashboard]
+    E -->|Teacher| G[Teacher Dashboard]
+    E -->|Student| H[Student Dashboard]
+    
+    %% Admin Functions
+    F --> I[Add New Teacher]
+    F --> J[View/Edit Teachers]
+    F --> K[Approve Students]
+    F --> L[View System Analytics]
+    
+    %% Teacher Functions
+    G --> M[Set Availability]
+    G --> N[View Appointment Requests]
+    G --> O[Approve/Reject Appointments]
+    G --> P[View Messages]
+    G --> Q[View Calendar]
+    
+    %% Student Functions
+    H --> R[Search Teachers]
+    H --> S[Book Appointment]
+    H --> T[View Bookings]
+    H --> U[Send Messages]
+    H --> V[View Calendar]
+    
+    %% Database Interactions
+    I & J & K & L --> W[(Firebase Database)]
+    M & N & O & P & Q --> W
+    R & S & T & U & V --> W
+    
+    %% External Systems
+    W --> X[Firebase Auth]
+    W --> Y[Firestore]
+    W --> Z[Realtime DB]
+    
+    %% Additional Relationships
+    O --> S
+    N --> O
+    R --> S
+    K --> U
+    P --> U
 
+```
 
 ---
 
