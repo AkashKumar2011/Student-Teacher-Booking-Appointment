@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState , useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { toast } from 'react-hot-toast';
@@ -16,9 +16,23 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  const { login, setUserData } = useAuth();
+  const { login, userData ,setUserData } = useAuth();
   const navigate = useNavigate();
 
+
+  // Inside your component where you want to show the message
+  const [showStatus, setShowStatus] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowStatus(false);
+    }, 3000); // 5000ms = 5 seconds
+
+    return () => clearTimeout(timer); // Clean up on unmount
+  }, []);
+
+
+  // Handle form input changes
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData((prev) => ({
@@ -50,7 +64,7 @@ export default function Login() {
       console.log('User data:', userData);
 
       setUserData(userData);
-
+      console.log('User data set in context:', setUserData);
       const selectedRole = role.toLowerCase();
       console.log('Selected role:', selectedRole);
 
@@ -59,7 +73,16 @@ export default function Login() {
       } else if (selectedRole === 'teacher') {
         navigate('/teacher');
       } else if (selectedRole === 'student') {
-        navigate('/student');
+          if (userData.status === 'approved') {
+            navigate('/student'); 
+          }else if (userData.status === 'rejected' || userData.status === 'pending') {
+            setShowStatus(true);
+            toast.error(`Your account is either ${userData.status} approval. Please contact support.`);
+            console.error('User account status:', userData.status);
+            return;
+          }else{
+            navigate('/unauthorized');
+          }
       } else {
         navigate('/unauthorized');
       }
@@ -75,7 +98,35 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 px-4 sm:px-6 lg:px-8">
+      
+       {/* error handling message */}
+      {showStatus && ["rejected", "pending"].includes(userData?.status) && (
+        <div className="max-w-md w-full p-4 rounded-xl shadow-lg 
+          bg-gradient-to-r from-red-100 via-orange-100 to-red-100 
+          border-l-4 border-r-4 border-red-400 animate-fade-in">
+          <div className="text-center space-y-2">
+            <p className="text-sm font-medium text-red-800">
+              Your account is currently{" "}
+              <span className="font-bold capitalize">{userData?.status}</span>.
+            </p>
+            <p className="text-xs text-red-600">
+              Please contact support at{" "}
+              <a href="mailto:support@admin123.com" className="underline hover:text-red-800">
+                support@admin123.com
+              </a>{" "}
+              for assistance.
+            </p>
+            {["rejected", "pending"].includes(userData?.status) && (
+              <div className="mt-2 h-1.5 w-full bg-red-100 rounded-full overflow-hidden">
+                <div className="h-full bg-red-400 rounded-full animate-progress" 
+                    style={{ animationDuration: '3s' }}></div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       <div className="max-w-md w-full space-y-1 bg-white p-6 rounded-xl shadow-lg">
         <div className="text-center">
           <h2 className="text-3xl font-extrabold text-gray-900">Welcome Back</h2>

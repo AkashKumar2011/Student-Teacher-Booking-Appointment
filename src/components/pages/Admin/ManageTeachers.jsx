@@ -20,7 +20,8 @@ import {
   FiPhone,
   FiMail,
   FiLock,
-  FiAward
+  FiAward,
+  FiBriefcase
 } from 'react-icons/fi';
 
 const ManageTeachers = () => {
@@ -318,7 +319,7 @@ const ManageTeachers = () => {
                       
                       <div>
                         <label className=" text-sm font-medium text-gray-700 mb-1 flex items-center">
-                          <FiBook className="mr-2" /> Department
+                          <FiBriefcase className="mr-2" /> Department
                         </label>
                         <select
                           name="department"
@@ -438,17 +439,14 @@ const ManageTeachers = () => {
                         <FiUser className="text-indigo-600 text-xl" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h3 className="text-lg font-bold text-gray-900 truncate">
+                        <h3 className="text-2xl font-bold text-gray-900 truncate">
                           {teacher.fullName || teacher.name}
                         </h3>
                         <div className="flex items-center">
-                          <span className={`px-2 py-1 text-xs rounded-full ${
-                            teacher.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                          <span className={`px-2 py-0.5 text-xs font-mediam rounded-full ${
+                            teacher.status === 'active' ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800'
                           }`}>
                             {teacher.status === 'active' ? 'Active' : 'Inactive'}
-                          </span>
-                          <span className="ml-2 text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
-                            {teacher.department}
                           </span>
                         </div>
                       </div>
@@ -491,11 +489,18 @@ const ManageTeachers = () => {
                           </button>
                         </span>
                       </div>
+
+                      <div className="flex items-center text-sm">
+                        <FiBriefcase  className="text-indigo-500 mr-3 flex-shrink-0" />
+                        <span className="text-gray-600">
+                          <span className="font-medium text-gray-700">Department :</span> {teacher.department}
+                        </span>
+                      </div>
                       
                       <div className="flex items-start text-sm">
                         <FiBook className="text-indigo-500 mr-3 mt-1 flex-shrink-0" />
                         <div>
-                          <span className="font-medium text-gray-700">Subjects:</span>
+                          <span className="font-medium text-gray-700">Subjects :</span>
                           <div className="flex flex-wrap gap-2 mt-1">
                             {(teacher.subjects || [teacher.subject]).filter(s => s).map(subject => (
                               <span key={subject} className="bg-indigo-100 text-indigo-800 px-2 py-1 rounded-full text-xs">

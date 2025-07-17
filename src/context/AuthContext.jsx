@@ -80,6 +80,7 @@ export function AuthProvider({ children }) {
         role: role.toLowerCase(),
         createdAt: new Date(),
         isActive: true,
+        status: 'pending', // Default status for new users
         emailVerified: false,
         verificationEmailSentAt: new Date(),
       });
@@ -230,6 +231,7 @@ const login = async (email, password, userRole) => {
       role: role,
       emailVerified: user.emailVerified,
     };
+    console.log('Fetched user data:', fetchedUserData);
 
     setCurrentUser(user);
     setUserData(fetchedUserData);
@@ -253,85 +255,7 @@ const login = async (email, password, userRole) => {
     }
   };
 
-
-// useEffect(() => {
-//     console.log('[DEBUG] Initializing teacher search...');
-    
-//     const fetchTeachers = async () => {
-//       try {
-//         // First verify database connection
-//         console.log('[DEBUG] Testing database connection...');
-//         const testQuery = query(collection(db, 'teachers'), limit(1));
-//         const testSnapshot = await getDocs(testQuery);
-        
-//         if (testSnapshot.empty) {
-//           console.warn('[WARNING] Teachers collection exists but is empty');
-//         } else {
-//           console.log('[DEBUG] Connection successful, found:', testSnapshot.docs[0].data());
-//         }
-
-//         // Set up the main query
-//         let q;
-//         if (departmentFilter) {
-//           console.log(`[DEBUG] Filtering by department: ${departmentFilter}`);
-//           q = query(
-//             collection(db, 'teachers'),
-//             where('department', '==', departmentFilter)
-//           );
-//         } else {
-//           console.log('[DEBUG] Fetching all teachers');
-//           q = query(collection(db, 'teachers'));
-//         }
-
-//         console.log('[DEBUG] Setting up real-time listener...');
-//         const unsubscribe = onSnapshot(q, 
-//           (snapshot) => {
-//             console.log(`[DEBUG] Received snapshot with ${snapshot.size} documents`);
-            
-//             if (snapshot.empty) {
-//               console.warn('[WARNING] No teachers found matching query');
-//               setError('No teachers found in the database');
-//             } else {
-//               const teachersData = snapshot.docs.map(doc => {
-//                 const data = doc.data();
-//                 console.log(`[DEBUG] Processing teacher ${doc.id}:`, data);
-                
-//                 return {
-//                   id: doc.id,
-//                   name: data.name || 'Unknown Teacher',
-//                   department: data.department || 'No Department',
-//                   subject: data.subject || 'No Subject'
-//                 };
-//               });
-              
-//               setTeachers(teachersData);
-//               setError(null);
-//             }
-//             setLoading(false);
-//           },
-//           (error) => {
-//             console.error('[ERROR] Snapshot error:', error);
-//             setError(`Failed to load teachers: ${error.message}`);
-//             setLoading(false);
-//           }
-//         );
-
-//         return unsubscribe;
-//       } catch (err) {
-//         console.error('[ERROR] Database operation failed:', err);
-//         setError(`Database error: ${err.message}`);
-//         setLoading(false);
-//         return () => {}; // Return empty cleanup function
-//       }
-//     };
-
-//     fetchTeachers();
-//   }, [departmentFilter]);
-
-
-//---------------------------
-
-
+  // Reset password function
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {

@@ -1,230 +1,256 @@
-// src/components/Student/StudentDashboard.jsx
-import { Link, useNavigate } from 'react-router-dom';
+// src/pages/student/StudentDashboard.jsx
+import React, { useState } from 'react';
 import { 
-  FiHome, 
-  FiCalendar, 
-  FiUser, 
-  FiMessageSquare, 
-  FiBook,
-  FiClock,
-  FiCheck,
-  FiX
-} from 'react-icons/fi';
+  FaSearch, 
+  FaCalendarAlt, 
+  FaEnvelope, 
+  FaUser, 
+  FaSignOutAlt, 
+  FaHome,
+  FaArrowLeft,
+  FaChevronDown,
+  FaChevronUp,
+  FaFilter,
+  FaBars,
+  FaTimes
+} from 'react-icons/fa';
 import { useAuth } from '../../../context/AuthContext';
-import { useEffect, useState } from 'react';
-import { db } from '../../../firebase/config';
-import { collection, query, where, onSnapshot } from 'firebase/firestore';
+import { useNavigate } from 'react-router-dom';
+import SearchTeacher from './SearchTeacher';
+import MyAppointments from './MyAppointments';
+import MessageList from './MessageList';
+import MyProfile from './MyProfile';
 
-export default function StudentDashboard() {
-  const { currentUser } = useAuth();
+const StudentDashboard = () => {
+  const [activeTab, setActiveTab] = useState('find-teachers');
+  const [view, setView] = useState('list');
+  const [detailItem, setDetailItem] = useState(null);
+  const [previousTab, setPreviousTab] = useState('');
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
+  const { currentUser, logout } = useAuth();
   const navigate = useNavigate();
-  const [stats, setStats] = useState({
-    upcoming: 0,
-    pending: 0,
-    approved: 0,
-    rejected: 0
-  });
 
-  useEffect(() => {
-    if (!currentUser?.uid) return;
-    
-    const q = query(
-      collection(db, 'appointments'),
-      where('studentId', '==', currentUser.uid)
-    );
-    
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const now = new Date();
-      let upcoming = 0;
-      let pending = 0;
-      let approved = 0;
-      let rejected = 0;
-      
-      snapshot.forEach(doc => {
-        const appt = doc.data();
-        const apptDate = new Date(`${appt.date}T${appt.timeSlot.split('-')[0]}`);
-        
-        if (appt.status === 'pending') pending++;
-        if (appt.status === 'approved') approved++;
-        if (appt.status === 'rejected') rejected++;
-        if (appt.status === 'approved' && apptDate > now) upcoming++;
-      });
-      
-      setStats({ upcoming, pending, approved, rejected });
-    });
-    
-    return () => unsubscribe();
-  }, [currentUser]);
+  const changeTab = (tab) => {
+    setPreviousTab(activeTab);
+    setActiveTab(tab);
+    setView('list');
+    setDetailItem(null);
+    setShowMobileMenu(false);
+  };
 
-  const dashboardCards = [
-    {
-      title: "Upcoming Appointments",
-      value: stats.upcoming,
-      icon: <FiCalendar className="text-3xl text-indigo-100" />,
-      bg: "bg-gradient-to-br from-indigo-600 to-purple-600",
-      action: () => navigate('/student/my-appointments')
-    },
-    {
-      title: "Pending Requests",
-      value: stats.pending,
-      icon: <FiClock className="text-3xl text-amber-100" />,
-      bg: "bg-gradient-to-br from-amber-500 to-orange-500",
-      action: () => navigate('/student/my-appointments')
-    },
-    {
-      title: "Approved Appointments",
-      value: stats.approved,
-      icon: <FiCheck className="text-3xl text-green-100" />,
-      bg: "bg-gradient-to-br from-green-500 to-emerald-500",
-      action: () => navigate('/student/my-appointments?status=approved')
-    },
-    {
-      title: "Rejected Requests",
-      value: stats.rejected,
-      icon: <FiX className="text-3xl text-red-100" />,
-      bg: "bg-gradient-to-br from-red-500 to-pink-500",
-      action: () => navigate('/student/my-appointments?status=rejected')
+  const goBack = () => {
+    if (view === 'detail') {
+      setView('list');
+      setDetailItem(null);
+    } else if (previousTab) {
+      setActiveTab(previousTab);
+      setPreviousTab('');
     }
-  ];
+  };
 
-  const quickActions = [
-    {
-      title: "Find Teachers",
-      icon: <FiUser className="mr-3 text-indigo-600" />,
-      action: () => navigate('/student/search-teachers'),
-      bg: "bg-gradient-to-r from-indigo-100 to-blue-100 hover:from-indigo-200 hover:to-blue-200"
-    },
-    {
-      title: "My Appointments",
-      icon: <FiCalendar className="mr-3 text-purple-600" />,
-      action: () => navigate('/student/my-appointments'),
-      bg: "bg-gradient-to-r from-purple-100 to-fuchsia-100 hover:from-purple-200 hover:to-fuchsia-200"
-    },
-    {
-      title: "Book Appointments",
-      icon: <FiCalendar className="mr-3 text-blue-500" />,
-      action: () => navigate('/student/book-appointment'),
-      bg: "bg-gradient-to-r from-orange-100 to-fuchsia-100 hover:from-purple-200 hover:to-fuchsia-200"
-    },
-    {
-      title: "Messages",
-      icon: <FiMessageSquare className="mr-3 text-green-600" />,
-      action: () => navigate('/student/message-system'),
-      bg: "bg-gradient-to-r from-green-100 to-emerald-100 hover:from-green-200 hover:to-emerald-200"
+  const viewDetails = (item, type) => {
+    setDetailItem({...item, type});
+    setView('detail');
+  };
+
+  const renderActiveTab = () => {
+    switch(activeTab) {
+      case 'find-teachers':
+        return <SearchTeacher onViewDetails={(teacher) => viewDetails(teacher, 'teacher')} />;
+      case 'my-appointments':
+        return <MyAppointments />;
+      case 'messages':
+        return <MessageList />;
+      case 'profile':
+        return <MyProfile />;
+      default:
+        return <SearchTeacher onViewDetails={(teacher) => viewDetails(teacher, 'teacher')} />;
     }
-  ];
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 mt-9 to-indigo-50 p-4 md:p-6">
-      <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        <div className="flex justify-between items-center mb-6">
-          <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-800 flex items-center">
-              <FiHome className="mr-3 text-indigo-600" />
-              Student Dashboard
-            </h1>
-            <p className="text-gray-600">Welcome back, {currentUser?.firstName || currentUser?.email}</p>
-          </div>
-        </div>
-        
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-6">
-          {dashboardCards.map((card, index) => (
-            <div 
-              key={index} 
-              onClick={card.action}
-              className={`${card.bg} text-white rounded-xl shadow-lg p-4 md:p-6 flex items-center cursor-pointer hover:shadow-xl transition-all`}
-            >
-              <div className="p-3 rounded-full bg-white/20 backdrop-blur-sm shadow-sm mr-4">
-                {card.icon}
+    <div className="bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 mt-12 min-h-screen">
+      {/* Header */}
+      <header className="bg-gradient-to-l from-indigo-600 via-purple-600 to-pink-600 text-white shadow-lg">
+        <div className="container mx-auto px-4 py-3 md:py-4 flex justify-between items-center">
+          <div className="flex items-center">
+            <div className="flex items-center">
+              <div className="bg-white rounded-full p-1 mr-3">
+                <div className="bg-gradient-to-br from-indigo-200 to-purple-300 rounded-full w-9 h-9 md:w-10 md:h-10 flex items-center justify-center">
+                  {currentUser?.photoURL ? (
+                    <img 
+                      src={currentUser.photoURL} 
+                      alt="Profile" 
+                      className="w-8 h-8 md:w-9 md:h-9 rounded-full object-cover"
+                    />
+                  ) : (
+                    <span className="text-indigo-800 font-bold">
+                      {currentUser?.displayName?.charAt(0) || 'S'}
+                    </span>
+                  )}
+                </div>
               </div>
               <div>
-                <p className="text-sm md:text-base font-medium text-white/90">{card.title}</p>
-                <p className="text-xl md:text-2xl font-bold">{card.value}</p>
+                <h1 className="text-lg md:text-xl font-bold">
+                  {view === 'detail' ? 
+                    detailItem?.type === 'teacher' ? 'Teacher Profile' : 
+                    'Student Dashboard'
+                  : 'Student Dashboard'}
+                </h1>
+                <p className="text-indigo-200 text-xs md:text-sm hidden md:block">
+                  {view !== 'detail' && `Welcome, ${currentUser?.displayName || currentUser?.email}`}
+                </p>
               </div>
             </div>
-          ))}
+          </div>
+          
+          <div className="flex items-center gap-2">
+            <button 
+              onClick={goBack}
+              className={`p-2 mr-1 md:mr-2 rounded-full ${previousTab || view === 'detail' ? 'bg-white/20 hover:bg-white/30' : 'invisible'}`}
+            >
+              <FaArrowLeft className="text-base md:text-lg" />
+            </button>
+            
+            <button 
+              onClick={() => changeTab('find-teachers')}
+              className={`p-2 rounded-full hidden md:block ${activeTab === 'find-teachers' && view === 'list' ? 'bg-white/20' : 'hover:bg-white/10'}`}
+              title="Dashboard Home"
+            >
+              <FaHome className="text-base md:text-lg" />
+            </button>
+            
+            <button 
+              className="md:hidden p-2 rounded-full bg-white/20"
+              onClick={() => setShowMobileMenu(!showMobileMenu)}
+            >
+              {showMobileMenu ? <FaTimes /> : <FaBars />}
+            </button>
+          </div>
         </div>
+      </header>
 
-        {/* Quick Actions */}
-        <div className="bg-white rounded-xl shadow-lg p-6 mb-6 border border-white/20 backdrop-blur-sm">
-          <h2 className="text-lg md:text-xl font-semibold mb-4 text-gray-800 flex items-center">
-            <FiClock className="mr-2 text-indigo-600" />
-            Quick Actions
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            {quickActions.map((action, index) => (
+      {/* Mobile Navigation Menu */}
+      {showMobileMenu && (
+        <div className="md:hidden bg-gradient-to-b from-purple-700 to-indigo-800 text-white shadow-lg z-40">
+          <div className="container mx-auto px-4 py-3">
+            <div className="grid grid-cols-2 gap-2">
               <button
-                key={index}
-                onClick={action.action}
-                className={`${action.bg} text-gray-800 py-3 px-4 rounded-lg transition-all flex items-center justify-center text-sm md:text-base font-medium shadow-sm hover:shadow-md`}
+                onClick={() => changeTab('find-teachers')}
+                className={`px-4 py-3 flex items-center justify-center gap-2 transition-colors text-sm rounded-lg ${
+                  activeTab === 'find-teachers' 
+                    ? 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-semibold' 
+                    : 'bg-white/10 text-white hover:bg-white/20'
+                }`}
               >
-                {action.icon}
-                {action.title}
+                <FaSearch /> Find
               </button>
-            ))}
+              <button
+                onClick={() => changeTab('my-appointments')}
+                className={`px-4 py-3 flex items-center justify-center gap-2 transition-colors text-sm rounded-lg ${
+                  activeTab === 'appointments' 
+                    ? 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-semibold' 
+                    : 'bg-white/10 text-white hover:bg-white/20'
+                }`}
+              >
+                <FaCalendarAlt /> Appts
+              </button>
+              <button
+                onClick={() => changeTab('messages')}
+                className={`px-4 py-3 flex items-center justify-center gap-2 transition-colors text-sm rounded-lg ${
+                  activeTab === 'messages' 
+                    ? 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-semibold' 
+                    : 'bg-white/10 text-white hover:bg-white/20'
+                }`}
+              >
+                <FaEnvelope /> Messages
+              </button>
+              <button
+                onClick={() => changeTab('profile')}
+                className={`px-4 py-3 flex items-center justify-center gap-2 transition-colors text-sm rounded-lg ${
+                  activeTab === 'profile' 
+                    ? 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-semibold' 
+                    : 'bg-white/10 text-white hover:bg-white/20'
+                }`}
+              >
+                <FaUser /> Profile
+              </button>
+            </div>
           </div>
         </div>
+      )}
 
-        {/* Recent Activity */}
-        <div className="bg-white rounded-xl shadow-lg p-6 border border-white/20 backdrop-blur-sm">
-          <h2 className="text-lg md:text-xl font-semibold mb-4 text-gray-800 flex items-center">
-            <FiBook className="mr-2 text-indigo-600" />
-            Getting Started
-          </h2>
-          <div className="space-y-4">
-            <div className="border-b border-gray-100 pb-4">
-              <div className="flex items-start">
-                <div className="bg-gradient-to-r from-indigo-100 to-purple-100 p-2 rounded-full mr-3 shadow-sm">
-                  <FiUser className="text-indigo-600 text-sm" />
-                </div>
-                <div>
-                  <p className="text-gray-800 font-medium">Find and book appointments with your teachers</p>
-                  <button
-                    onClick={() => navigate('/student/search-teachers')}
-                    className="mt-2 text-sm text-indigo-600 hover:text-indigo-800"
-                  >
-                    Browse Teachers →
-                  </button>
-                </div>
-              </div>
-            </div>
-            <div className="border-b border-gray-100 pb-4">
-              <div className="flex items-start">
-                <div className="bg-gradient-to-r from-blue-100 to-cyan-100 p-2 rounded-full mr-3 shadow-sm">
-                  <FiMessageSquare className="text-blue-600 text-sm" />
-                </div>
-                <div>
-                  <p className="text-gray-800 font-medium">Communicate with your teachers via messages</p>
-                  <button
-                    onClick={() => navigate('/student/message-system')}
-                    className="mt-2 text-sm text-blue-600 hover:text-blue-800"
-                  >
-                    View Messages →
-                  </button>
-                </div>
-              </div>
-            </div>
-            <div>
-              <div className="flex items-start">
-                <div className="bg-gradient-to-r from-green-100 to-emerald-100 p-2 rounded-full mr-3 shadow-sm">
-                  <FiCalendar className="text-green-600 text-sm" />
-                </div>
-                <div>
-                  <p className="text-gray-800 font-medium">Manage your upcoming appointments</p>
-                  <button
-                    onClick={() => navigate('/student/my-appointments')}
-                    className="mt-2 text-sm text-green-600 hover:text-green-800"
-                  >
-                    View Appointments →
-                  </button>
-                </div>
-              </div>
+      {/* Navigation - Only show when in list view */}
+      {view === 'list' && (
+        <nav className="bg-white shadow-md sticky top-16 z-30 hidden md:block">
+          <div className="container mx-auto px-4">
+            <div className="flex flex-wrap justify-center gap-1 sm:gap-0">
+              <button
+                onClick={() => changeTab('find-teachers')}
+                className={`px-4 py-3 flex items-center gap-2 transition-colors text-sm sm:text-base ${
+                  activeTab === 'find-teachers' 
+                    ? 'bg-gradient-to-r from-indigo-100 to-purple-100 text-indigo-700 border-b-4 border-indigo-600 font-semibold' 
+                    : 'text-gray-600 hover:bg-gray-100'
+                }`}
+              >
+                <FaSearch /> Find Teachers
+              </button>
+              <button
+                onClick={() => changeTab('my-appointments')}
+                className={`px-4 py-3 flex items-center gap-2 transition-colors text-sm sm:text-base ${
+                  activeTab === 'my-appointments' 
+                    ? 'bg-gradient-to-r from-indigo-100 to-purple-100 text-indigo-700 border-b-4 border-indigo-600 font-semibold' 
+                    : 'text-gray-600 hover:bg-gray-100'
+                }`}
+              >
+                <FaCalendarAlt /> My Appointments
+              </button>
+              <button
+                onClick={() => changeTab('messages')}
+                className={`px-4 py-3 flex items-center gap-2 transition-colors text-sm sm:text-base ${
+                  activeTab === 'messages' 
+                    ? 'bg-gradient-to-r from-indigo-100 to-purple-100 text-indigo-700 border-b-4 border-indigo-600 font-semibold' 
+                    : 'text-gray-600 hover:bg-gray-100'
+                }`}
+              >
+                <FaEnvelope /> My Messages
+              </button>
+              <button
+                onClick={() => changeTab('profile')}
+                className={`px-4 py-3 flex items-center gap-2 transition-colors text-sm sm:text-base ${
+                  activeTab === 'profile' 
+                    ? 'bg-gradient-to-r from-indigo-100 to-purple-100 text-indigo-700 border-b-4 border-indigo-600 font-semibold' 
+                    : 'text-gray-600 hover:bg-gray-100'
+                }`}
+              >
+                <FaUser /> My Profile
+              </button>
             </div>
           </div>
-        </div>
-      </div>
+        </nav>
+      )}
+
+      {/* Main Content */}
+      <main className="container mx-auto px-4 py-8 min-h-[calc(100vh-180px)]">
+        {view === 'list' ? (
+          renderActiveTab()
+        ) : (
+          <div className="bg-white rounded-2xl shadow-lg p-6">
+            <h2 className="text-2xl font-bold text-indigo-800 mb-6">
+              {detailItem?.type === 'teacher' ? 'Teacher Details' : 'Detail View'}
+            </h2>
+            {/* Detail view content would go here */}
+            <button
+              onClick={() => setView('list')}
+              className="mt-4 px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all"
+            >
+              Back to List
+            </button>
+          </div>
+        )}
+      </main>
     </div>
   );
-}
+};
+
+export default StudentDashboard;

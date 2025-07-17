@@ -14,6 +14,7 @@ export default function SignUp() {
     confirmPassword: '',
     studentId: '',
     department: '',
+    // status: 'pending',
     showPassword: false,
     showConfirmPassword: false
   });

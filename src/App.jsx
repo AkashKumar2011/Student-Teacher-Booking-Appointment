@@ -21,16 +21,17 @@ import ApproveStudents from './components/pages/Admin/ApproveStudents';
 
 // Teacher Pages
 import TeacherDashboard from './components/pages/Teacher/TeacherDashboard';
-import Schedule from './components/pages/Teacher/Schedule';
-import Appointments from './components/pages/Teacher/Appointments';
-import Messages from './components/pages/Teacher/Messages';
+import ScheduleAppointment from './components/pages/teacher/ScheduleAppointment';
+import ViewMessages from './components/pages/teacher/ViewMessages';
+// import ViewAllAppointments from './components/pages/teacher/ViewAllAppointments';
+// import viewMessages from './components/pages/teacher/viewMessages';
 
 // Student Pages
 import StudentDashboard from './components/pages/Student/StudentDashboard';
 import SearchTeacher from './components/pages/Student/SearchTeacher';
 import BookAppointment from './components/pages/Student/BookAppointment';
 import MyAppointments from './components/pages/Student/MyAppointments';
-import MessageSystem from './components/pages/student/MessageSystem';
+import SendMessage from './components/pages/student/SendMessage';
 
 // public pages & login/register imports...
 import PrivateRoute from './components/Auth/PrivateRoute';
@@ -73,20 +74,21 @@ function App() {
             </Route>
 
             {/* Teacher */}
-            <Route
-              path="/teacher"
-              element={
-                <PrivateRoute>
-                  <TeacherRoute>
-                    <Outlet />  
-                  </TeacherRoute>
-                </PrivateRoute>
-              }
-            >
+              <Route
+                path="/teacher"
+                element={
+                  <PrivateRoute>
+                    <TeacherRoute>
+                      <Outlet />  
+                    </TeacherRoute>
+                  </PrivateRoute>
+                }
+              >
               <Route index element={<TeacherDashboard />} />
-              <Route path="schedule" element={<Schedule />} />
-              <Route path="appointments" element={<Appointments />} />
-              {/* <Route path="message-system" element={<MessageSystem />} /> */}
+              <Route path="messages" element={<ViewMessages />} />
+              <Route path="schedule" element={<ScheduleAppointment />} />
+              {/* <Route path="appointments" element={<ScheduleAppointment />} /> */}
+              {/* <Route path="view-appointments" element={<ViewAllAppointments />} /> */}
             </Route>
 
             {/* Student */}
@@ -94,7 +96,9 @@ function App() {
               path="/student"
               element={
                 <PrivateRoute>
-                  <Outlet />
+                  <StudentRoute>
+                    <Outlet />
+                  </StudentRoute>
                 </PrivateRoute>
               }
             >
@@ -102,7 +106,7 @@ function App() {
               <Route path="search-teachers" element={<SearchTeacher />} />
               <Route path="book-appointment" element={<BookAppointment />} />
               <Route path="my-appointments" element={<MyAppointments />} />
-              <Route path="message-system" element={<MessageSystem />} />
+              <Route path="send-message" element={<SendMessage />} />
             </Route>
 
 

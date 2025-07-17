@@ -20,32 +20,39 @@ const ApproveStudents = () => {
   const [pendingStudents, setPendingStudents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchPendingStudents = async () => {
-      try {
-        const q = query(collection(db, 'users'), where('status', '==', 'pending'));
-        const querySnapshot = await getDocs(q);
-        const students = [];
-        querySnapshot.forEach((doc) => {
-          students.push({ id: doc.id, ...doc.data() });
-        });
-        setPendingStudents(students);
-        setLoading(false);
-      } catch (error) {
-        toast.error('Error fetching students: ' + error.message);
-        console.error('Error fetching students:', error);
-        setLoading(false);
-      }
-    };
+  const fetchPendingStudents = async () => {
+    try {
+      setLoading(true);
+      const q = query(
+        collection(db, 'students'), 
+        where('role', '==', 'student'),
+        where('status', '==', 'pending')
+      );
+      const querySnapshot = await getDocs(q);
+      const students = [];
+      querySnapshot.forEach((doc) => {
+        students.push({ id: doc.id, ...doc.data() });
+      });
+      setPendingStudents(students);
+    } catch (error) {
+      toast.error('Error fetching students: ' + error.message);
+      console.error('Error fetching students:', error);
+    } finally {
+      setLoading(false);
+      setIsRefreshing(false);
+    }
+  };
 
+  useEffect(() => {
     fetchPendingStudents();
   }, []);
 
   const handleApprove = async (studentId) => {
     try {
-      await updateDoc(doc(db, 'users', studentId), {
+      await updateDoc(doc(db, 'students', studentId), {
         status: 'approved'
       });
       setPendingStudents(pendingStudents.filter(student => student.id !== studentId));
@@ -58,7 +65,7 @@ const ApproveStudents = () => {
 
   const handleReject = async (studentId) => {
     try {
-      await updateDoc(doc(db, 'users', studentId), {
+      await updateDoc(doc(db, 'students', studentId), {
         status: 'rejected'
       });
       setPendingStudents(pendingStudents.filter(student => student.id !== studentId));
@@ -67,6 +74,11 @@ const ApproveStudents = () => {
       toast.error('Error rejecting student: ' + error.message);
       console.error('Error rejecting student:', error);
     }
+  };
+
+  const handleRefresh = () => {
+    setIsRefreshing(true);
+    fetchPendingStudents();
   };
 
   const filteredStudents = pendingStudents.filter(student => {
@@ -79,17 +91,19 @@ const ApproveStudents = () => {
     );
   });
 
-  if (loading) return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
-    </div>
-  );
+  if (loading && !isRefreshing) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 p-4 md:p-6 mt-9">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 mt-9 p-4 md:p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="bg-gradient-to-l from-blue-500 to-indigo-500 text-white  hover:from-blue-600 hover:to-indigo-600 transition-colors px-6 py-4 rounded-xl shadow-lg mb-6 flex justify-between items-center">
+        <div className="bg-gradient-to-l from-blue-500 to-indigo-500 text-white hover:from-blue-600 hover:to-indigo-600 transition-colors px-6 py-4 rounded-xl shadow-lg mb-6 flex justify-between items-center">
           <div className="flex items-center">
             <FiUser className="text-white text-2xl mr-3" />
             <div>
@@ -132,26 +146,45 @@ const ApproveStudents = () => {
             />
           </div>
           <button
-            onClick={() => window.location.reload()}
-            className="px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white rounded-lg flex items-center whitespace-nowrap shadow-md"
+            onClick={handleRefresh}
+            disabled={isRefreshing}
+            className={`px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white rounded-lg flex items-center whitespace-nowrap shadow-md ${isRefreshing ? 'opacity-75' : ''}`}
           >
-            <FiRefreshCw className="mr-2" /> Refresh
+            {isRefreshing ? (
+              <>
+                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Refreshing...
+              </>
+            ) : (
+              <>
+                <FiRefreshCw className="mr-2" /> Refresh
+              </>
+            )}
           </button>
         </div>
 
         {/* Students List */}
         {filteredStudents.length === 0 ? (
           <div className="text-center py-12 bg-white rounded-xl shadow-sm border border-gray-200">
-            <p className="text-gray-500">No pending student registrations found</p>
-            <button
-              onClick={() => setSearchTerm('')}
-              className="mt-4 px-4 py-2 text-indigo-600 hover:text-indigo-800 flex items-center justify-center mx-auto"
-            >
-              <FiRefreshCw className="mr-2" /> Clear Search
-            </button>
+            {searchTerm ? (
+              <>
+                <p className="text-gray-500">No students match your search criteria</p>
+                <button
+                  onClick={() => setSearchTerm('')}
+                  className="mt-4 px-4 py-2 text-indigo-600 hover:text-indigo-800 flex items-center justify-center mx-auto"
+                >
+                  <FiRefreshCw className="mr-2" /> Clear Search
+                </button>
+              </>
+            ) : (
+              <p className="text-gray-500">No pending student registrations found</p>
+            )}
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredStudents.map((student) => (
               <div 
                 key={student.id} 
@@ -163,10 +196,10 @@ const ApproveStudents = () => {
                       <FiUser className="text-indigo-600 text-xl" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className="text-lg font-bold text-gray-900 truncate">
-                        {student.name}
+                      <h3 className="text-2xl font-bold text-gray-900 truncate">
+                        {student.firstName} {student.lastName || ' '}
                       </h3>
-                      <span className="px-2 py-1 text-xs bg-yellow-100 text-yellow-800 rounded-full">
+                      <span className="inline-block mt-1 px-2 py-1 text-xs font-medium bg-yellow-200 text-yellow-900 rounded-full">
                         Pending Approval
                       </span>
                     </div>
@@ -176,7 +209,7 @@ const ApproveStudents = () => {
                     <div className="flex items-center text-sm">
                       <FiAward className="text-indigo-500 mr-3 flex-shrink-0" />
                       <span className="text-gray-600">
-                        <span className="font-medium text-gray-700">Student ID:</span> {student.studentId}
+                        <span className="font-medium text-gray-700">Student ID:</span> {student.studentId || 'N/A'}
                       </span>
                     </div>
                     
@@ -190,23 +223,25 @@ const ApproveStudents = () => {
                     <div className="flex items-center text-sm">
                       <FiBook className="text-indigo-500 mr-3 flex-shrink-0" />
                       <span className="text-gray-600">
-                        <span className="font-medium text-gray-700">Department:</span> {student.department}
+                        <span className="font-medium text-gray-700">Department:</span> {student.department || 'N/A'}
                       </span>
                     </div>
                   </div>
                   
-                  <div className="mt-6 flex justify-end space-x-3">
+                  <div className="mt-6 flex justify-between space-x-3">
                     <button
                       onClick={() => handleApprove(student.id)}
                       className="px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-lg hover:from-green-600 hover:to-emerald-700 transition-colors flex items-center shadow-sm"
                     >
-                      <FiCheck className="mr-2" /> Approve
+                     <span className='font-bold text-2xl'> <FiCheck className="mr-1 font-bold" /> </span>
+                      <span className="hidden sm:inline font-medium "> Approve</span>
                     </button>
                     <button
                       onClick={() => handleReject(student.id)}
                       className="px-4 py-2 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-lg hover:from-red-600 hover:to-pink-600 transition-colors flex items-center shadow-sm"
                     >
-                      <FiX className="mr-2" /> Reject
+                      <span className='font-bold text-2xl'> <FiX className="mr-1" /> </span>
+                      <span className="hidden sm:inline font-medium ">Reject</span>
                     </button>
                   </div>
                 </div>
