@@ -22,9 +22,10 @@ import ApproveStudents from './components/pages/Admin/ApproveStudents';
 // Teacher Pages
 import TeacherDashboard from './components/pages/Teacher/TeacherDashboard';
 import ScheduleAppointment from './components/pages/teacher/ScheduleAppointment';
-import ViewMessages from './components/pages/teacher/ViewMessages';
-// import ViewAllAppointments from './components/pages/teacher/ViewAllAppointments';
-// import viewMessages from './components/pages/teacher/viewMessages';
+import AppointmentList from './components/pages/teacher/AppointmentList';
+import MessageList from './components/pages/teacher/MessageList';
+import AvailabilityList from './components/pages/teacher/AvailabilityList';
+import TeacherProfile from './components/pages/teacher/TeacherProfile';
 
 // Student Pages
 import StudentDashboard from './components/pages/Student/StudentDashboard';
@@ -85,10 +86,11 @@ function App() {
                 }
               >
               <Route index element={<TeacherDashboard />} />
-              <Route path="messages" element={<ViewMessages />} />
-              <Route path="schedule" element={<ScheduleAppointment />} />
-              {/* <Route path="appointments" element={<ScheduleAppointment />} /> */}
-              {/* <Route path="view-appointments" element={<ViewAllAppointments />} /> */}
+              <Route path="MessageList" element={<MessageList/>} />
+              <Route path="ScheduleAppointment" element={<ScheduleAppointment />} />
+              <Route path="AppointmentList" element={<AppointmentList />} />
+              <Route path="availabilityList" element={<AvailabilityList />} />
+              <Route path="TeacherProfile" element={<TeacherProfile />} />
             </Route>
 
             {/* Student */}

@@ -40,9 +40,11 @@ export default function BookAppointment({ teacher, onClose }) {
       
       await addDoc(collection(db, 'appointments'), {
         studentId: currentUser.uid,
-        studentName: currentUser.displayName || currentUser.email || 'Unknown Student',
+        studentName: currentUser.displayName || 'Unknown Student',
+        studentEmail: currentUser.email || 'No email',
         teacherId: teacher.id,
-        teacherName: teacher.name || 'Unknown Teacher',
+        teacherName: teacher.teacherName || 'Unknown Teacher',
+        teacherDepartment: teacher.department || 'No department',
         dateTime: Timestamp.fromDate(appointmentDateTime),
         purpose: purpose.trim(),
         status: 'pending',
@@ -67,7 +69,7 @@ export default function BookAppointment({ teacher, onClose }) {
         <div className="bg-gradient-to-r from-blue-500 to-indigo-600 p-5 text-white">
           <div className="flex justify-between items-center">
             <h3 className="text-xl font-bold">
-              Book Appointment with {teacher.name || 'Teacher'}
+              Book Appointment with {teacher.teacherName || 'Teacher'}
             </h3>
             <button 
               onClick={onClose}
@@ -90,13 +92,13 @@ export default function BookAppointment({ teacher, onClose }) {
               <div className="text-green-500 text-5xl mb-4">✓</div>
               <h4 className="text-xl font-bold text-gray-800 mb-2">Appointment Requested!</h4>
               <p className="text-gray-600">
-                Your appointment request has been sent to {teacher.name}.
+                Your appointment request has been sent to {teacher.teacherName}.
               </p>
             </div>
           ) : (
             <form onSubmit={handleSubmit}>
               <div className="mb-4">
-                <label className="block text-gray-700 mb-2 flex items-center">
+                <label className="block text-gray-700 mb-2  items-center">
                   <FaCalendarAlt className="mr-2 text-indigo-600" /> Date
                 </label>
                 <input
@@ -110,7 +112,7 @@ export default function BookAppointment({ teacher, onClose }) {
               </div>
               
               <div className="mb-4">
-                <label className="block text-gray-700 mb-2 flex items-center">
+                <label className="block text-gray-700 mb-2  items-center">
                   <FaClock className="mr-2 text-indigo-600" /> Time
                 </label>
                 <input
@@ -123,7 +125,7 @@ export default function BookAppointment({ teacher, onClose }) {
               </div>
               
               <div className="mb-6">
-                <label className="block text-gray-700 mb-2 flex items-center">
+                <label className="block text-gray-700 mb-2  items-center">
                   <FaComment className="mr-2 text-indigo-600" /> Purpose
                 </label>
                 <textarea

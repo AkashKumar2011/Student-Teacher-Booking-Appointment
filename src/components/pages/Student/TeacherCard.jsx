@@ -21,7 +21,7 @@ export default function TeacherCard({ teacher, onViewDetails }) {
             {teacher.avatar ? (
               <img 
                 src={teacher.avatar} 
-                alt={teacher.teacherName} 
+                alt={teacher.fullName} 
                 className="w-12 h-12 rounded-xl object-cover"
               />
             ) : (
@@ -31,7 +31,7 @@ export default function TeacherCard({ teacher, onViewDetails }) {
           <div className="flex-1 min-w-0">
             <div className="flex justify-between items-start">
               <div className="truncate">
-                <h3 className="text-lg sm:text-xl font-bold text-gray-800 truncate">{teacher.teacherName}</h3>
+                <h3 className="text-xlg sm:text-xl font-bold text-gray-800 truncate">{teacher.teacherName}</h3>
                 <p className={`text-xs px-2 py-1 rounded-full inline-block ${statusColor}`}>
                   {teacher.status}
                 </p>
@@ -51,10 +51,10 @@ export default function TeacherCard({ teacher, onViewDetails }) {
         
         {showDetails && (
           <div className="mb-4 border-t border-gray-100 pt-4">
-            <p className="text-gray-600 mb-1"><span className="font-medium">Teacher ID:</span> {teacher.teacherId || 'N/A'}</p>
-            <p className="text-gray-600 text-sm truncate"><span className="font-medium">Email:</span> {teacher.email || 'N/A'}</p>
-            <p className="text-gray-600 mb-1"><span className="font-medium">Department:</span> {teacher.department}</p>
-            <p className="text-gray-600 mb-1"><span className="font-medium">Subjects:</span> {teacher.subjects?.join(", ") || 'N/A'}</p>
+            <p className="text-gray-600 my-1 text-sm truncate"><span className="font-medium">Teacher ID :</span> {teacher.teacherId || 'N/A'}</p>
+            <p className="text-gray-600 my-1 text-sm truncate"><span className="font-medium">Email ID :</span> {teacher.email || 'N/A'}</p>
+            <p className="text-gray-600 my-1 text-sm truncate"><span className="font-medium">Department :</span> {teacher.department}</p>
+            <p className="text-gray-600 my-1 text-sm truncate"><span className="font-medium">Subjects :</span> {teacher.subjects?.join(", ") || 'N/A'}</p>
           </div>
         )}
         

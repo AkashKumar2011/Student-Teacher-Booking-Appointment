@@ -8,7 +8,8 @@ import {
   onSnapshot, 
   doc, 
   updateDoc,
-  orderBy
+  orderBy,
+  terminate
 } from 'firebase/firestore';
 import { useAuth } from '../../../context/AuthContext';
 import { 
@@ -24,10 +25,14 @@ import {
   FaFilter,
   FaChevronDown,
   FaChevronUp,
-  FaSync
+  FaSync,
+  FaInbox,
+  FaBook,
+  FaPen
 } from 'react-icons/fa';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
+import SendMessage from './SendMessage';
 
 export default function MyAppointments() {
   const { currentUser } = useAuth();
@@ -149,31 +154,13 @@ useEffect(() => {
     );
   };
 
-  const formatDate = (dateString) => {
-    try {
-      const date = new Date(dateString);
-      return date.toLocaleDateString('en-US', { 
-        month: 'short', 
-        day: 'numeric',
-        year: 'numeric'
-      });
-    } catch {
-      return dateString;
-    }
-  };
-
-const formatTime = (timeSlot) => {
-  if (!timeSlot || typeof timeSlot !== 'string') return 'N/A';
-  return timeSlot.split('/').join(' to ');
-};
-
 
   const isUpcoming = (appointment) => {
     if (appointment.status !== 'approved') return false;
     const now = new Date();
     try {
       const [startTime] = appointment.timeSlot.split('-');
-      const apptDate = new Date(`${appointment.date}T${startTime}`);
+      const apptDate = new Date(`${appointment.dateTime}T${startTime}`);
       return apptDate > now;
     } catch {
       return false;
@@ -386,12 +373,14 @@ const formatTime = (timeSlot) => {
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900">
-                          {formatDate(appointment.date)}
+                        <div className="text-sm  text-gray-600 flex items-center">
+                          <FaCalendar className="mr-1 text-indigo-500" />            
+                          {appointment.dateTime.toDate().toLocaleDateString()}
+
                         </div>
                         <div className="text-sm text-gray-500 flex items-center">
-                          <FaClock className="mr-1 text-indigo-500" />
-                          {formatTime(appointment.timeSlot)}
+                          <FaClock className="mr-1 text-indigo-500" />                       
+                          {appointment.dateTime.toDate().toLocaleTimeString()}
                         </div>
                         {isUpcoming(appointment) && (
                           <span className="inline-block mt-1 bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
@@ -401,7 +390,7 @@ const formatTime = (timeSlot) => {
                       </td>
                       <td className="px-6 py-4">
                         <div className="text-sm text-gray-500 max-w-xs truncate flex items-start">
-                          <FaCalendar className="mr-2 mt-0.5 flex-shrink-0 text-indigo-500" />
+                          <FaPen className="mr-2 mt-0.5 flex-shrink-0 text-indigo-500" />
                           {appointment.purpose}
                         </div>
                       </td>
@@ -459,11 +448,11 @@ const formatTime = (timeSlot) => {
                   <div className="mb-4">
                     <div className="flex items-center text-sm text-gray-500 mb-1">
                       <FaCalendar className="mr-2 text-indigo-500" />
-                      {formatDate(appointment.date)}
+                      {appointment.dateTime.toDate().toLocaleDateString()}
                     </div>
                     <div className="flex items-center text-sm text-gray-500">
                       <FaClock className="mr-2 text-indigo-500" />
-                      {formatTime(appointment.timeSlot)}
+                      {appointment.dateTime.toDate().toLocaleTimeString()}
                     </div>
                     {isUpcoming(appointment) && (
                       <span className="inline-block mt-1 bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
@@ -477,12 +466,34 @@ const formatTime = (timeSlot) => {
                   </div>
                   
                   <div className="flex space-x-3">
-                    <button
+                    {/* <button
                       onClick={() => navigate(`/student/messages?teacherId=${appointment.teacherId}`)}
                       className="flex-1 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all"
                     >
                       Message
+                    </button> */}
+                    
+{/*                     
+                      <SendMessage 
+                        // teacherId={appointment.teacherId}
+                        appointment={appointment}
+                        onClose={() => setShowBookModal(false)}
+                      >message</SendMessage> */}
+                    <button
+                      onClick={() => navigate('/student/send-message', { 
+                        state: { 
+                          teacher: {
+                            id: appointment.teacherId,
+                            name: appointment.teacherName
+                          }
+                        } 
+                      })}
+                      className="text-indigo-600 hover:text-indigo-900 transition-colors"
+                      disabled={loading}
+                    >
+                      Message
                     </button>
+
                     {(appointment.status === 'pending' || (appointment.status === 'approved' && isUpcoming(appointment))) && (
                       <button
                         onClick={() => handleCancelAppointment(appointment.id)}

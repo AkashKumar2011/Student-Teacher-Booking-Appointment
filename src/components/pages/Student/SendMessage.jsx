@@ -28,7 +28,7 @@ export default function SendMessage({ teacher, onClose }) {
         studentId: currentUser.uid,
         studentName: currentUser.displayName || currentUser.email || 'Unknown Student',
         teacherId: teacher.id,
-        teacherName: teacher.name || 'Unknown Teacher',
+        teacherName: teacher.teacherName || 'Unknown Teacher',
         message: message.trim(),
         createdAt: Timestamp.now(),
         read: false
@@ -49,10 +49,10 @@ export default function SendMessage({ teacher, onClose }) {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden">
-        <div className="bg-gradient-to-r from-green-500 to-emerald-600 p-5 text-white">
+        <div className="bg-gradient-to-l from-green-500 to-emerald-600 p-5 text-white">
           <div className="flex justify-between items-center">
             <h3 className="text-xl font-bold">
-              Message {teacher.name || 'Teacher'}
+              Message {teacher.teacherName || 'Teacher'}
             </h3>
             <button 
               onClick={onClose}
@@ -75,13 +75,13 @@ export default function SendMessage({ teacher, onClose }) {
               <div className="text-green-500 text-5xl mb-4">✓</div>
               <h4 className="text-xl font-bold text-gray-800 mb-2">Message Sent!</h4>
               <p className="text-gray-600">
-                Your message has been sent to {teacher.name}.
+                Your message has been sent to {teacher.teacherName}.
               </p>
             </div>
           ) : (
             <form onSubmit={handleSubmit}>
               <div className="mb-6">
-                <label className="block text-gray-700 mb-2 flex items-center">
+                <label className="block text-gray-700 mb-2  items-center">
                   <FaEnvelope className="mr-2 text-emerald-600" /> Your Message
                 </label>
                 <textarea
@@ -105,7 +105,7 @@ export default function SendMessage({ teacher, onClose }) {
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 py-3 px-4 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-lg hover:from-green-600 hover:to-emerald-700 transition-all disabled:opacity-70 flex items-center justify-center"
+                  className="flex-1 py-3 px-4 bg-gradient-to-l from-green-500 to-emerald-600 text-white rounded-lg hover:from-green-600 hover:to-emerald-700 transition-all disabled:opacity-70 flex items-center justify-center"
                   disabled={isSubmitting}
                 >
                   <FaPaperPlane className="mr-2" />

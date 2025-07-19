@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { collection, getDocs, query } from 'firebase/firestore';
 import { db } from '../../../firebase/config';
 import TeacherCard from './TeacherCard';
-import { FaSearch, FaSpinner, FaFilter } from 'react-icons/fa';
+import { FaSearch, FaSpinner, FaFilter, FaArrowLeft, FaHome } from 'react-icons/fa';
 
 export default function SearchTeacher({ onViewDetails }) {
   const [searchTerm, setSearchTerm] = useState('');
@@ -87,9 +87,37 @@ export default function SearchTeacher({ onViewDetails }) {
 
   return (
     <div className="max-w-6xl mx-auto">
-      <h2 className="text-3xl font-bold mb-6 text-indigo-800">Find a Teacher</h2>
       
-      <div className="flex flex-col md:flex-row gap-4 mb-6">
+      {/* Header */}
+      <div className="bg-gradient-to-r from-purple-600 to-indigo-600 px-6 py-4 rounded-2xl shadow-lg mb-6 flex flex-col sm:flex-row sm:justify-between sm:items-center">
+        <div className="flex items-center mb-4 sm:mb-0">
+          <div className="bg-white/20 p-3 rounded-xl mr-4">           
+          <FaSearch className="text-white text-xl" />
+          </div>
+          <div>
+            <h1 className="text-xl md:text-2xl font-bold text-white">Find a Teacher</h1>
+            <p className="text-blue-100 text-sm">Manage your scheduled appointments with teachers</p>
+          </div>
+        </div>
+        <div className="flex space-x-2">
+          <button
+            onClick={() => navigate(-1)}
+            className="p-2 bg-white/20 text-white rounded-xl hover:bg-white/30 transition-colors"
+            title="Go back"
+          >
+            <FaArrowLeft className="w-5 h-5" />
+          </button>
+          <button
+            onClick={() => navigate('/student')}
+            className="p-2 bg-white/20 text-white rounded-xl hover:bg-white/30 transition-colors"
+            title="Go to dashboard"
+          >
+            <FaHome className="w-5 h-5" />
+          </button>
+        </div>
+      </div>
+      
+      <div className="flex flex-col md:flex-row gap-4 mb-6 bg-white rounded-2xl shadow-lg p-4">
         <div className="relative flex-grow">
           <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
             <FaSearch className="text-gray-400" />

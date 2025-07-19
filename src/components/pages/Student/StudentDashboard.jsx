@@ -38,15 +38,6 @@ const StudentDashboard = () => {
     setShowMobileMenu(false);
   };
 
-  const goBack = () => {
-    if (view === 'detail') {
-      setView('list');
-      setDetailItem(null);
-    } else if (previousTab) {
-      setActiveTab(previousTab);
-      setPreviousTab('');
-    }
-  };
 
   const viewDetails = (item, type) => {
     setDetailItem({...item, type});
@@ -72,7 +63,7 @@ const StudentDashboard = () => {
     <div className="bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 mt-12 min-h-screen">
       {/* Header */}
       <header className="bg-gradient-to-l from-indigo-600 via-purple-600 to-pink-600 text-white shadow-lg">
-        <div className="container mx-auto px-4 py-3 md:py-4 flex justify-between items-center">
+        <div className="container mx-auto px-5 pl-15 py-3 md:py-4 flex justify-between items-center">
           <div className="flex items-center">
             <div className="flex items-center">
               <div className="bg-white rounded-full p-1 mr-3">
@@ -105,20 +96,6 @@ const StudentDashboard = () => {
           </div>
           
           <div className="flex items-center gap-2">
-            <button 
-              onClick={goBack}
-              className={`p-2 mr-1 md:mr-2 rounded-full ${previousTab || view === 'detail' ? 'bg-white/20 hover:bg-white/30' : 'invisible'}`}
-            >
-              <FaArrowLeft className="text-base md:text-lg" />
-            </button>
-            
-            <button 
-              onClick={() => changeTab('find-teachers')}
-              className={`p-2 rounded-full hidden md:block ${activeTab === 'find-teachers' && view === 'list' ? 'bg-white/20' : 'hover:bg-white/10'}`}
-              title="Dashboard Home"
-            >
-              <FaHome className="text-base md:text-lg" />
-            </button>
             
             <button 
               className="md:hidden p-2 rounded-full bg-white/20"
@@ -126,6 +103,7 @@ const StudentDashboard = () => {
             >
               {showMobileMenu ? <FaTimes /> : <FaBars />}
             </button>
+
           </div>
         </div>
       </header>
