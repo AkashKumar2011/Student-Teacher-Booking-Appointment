@@ -1,4 +1,4 @@
-// src/components/teacher/AppointmentList.jsx
+// src/components/teacher/ManageAppointmentList.jsx
 import React, { useState, useEffect } from 'react';
 import { collection, query, where, getDocs, updateDoc, doc } from 'firebase/firestore';
 import { db } from '../../../firebase/config';
@@ -17,7 +17,7 @@ import {
 } from 'react-icons/fa';
 import { FaU } from 'react-icons/fa6';
 
-export default function AppointmentList() {
+export default function ManageAppointmentList() {
   const { currentUser } = useAuth();
   const [appointments, setAppointments] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
