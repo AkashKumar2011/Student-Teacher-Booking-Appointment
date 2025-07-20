@@ -111,7 +111,6 @@ function App() {
               <Route path="BookAppointment" element={<BookAppointment />} />
               <Route path="AppointmentList" element={<AppointmentList />} />
               <Route path="MyAppointments" element={<MyAppointments />} />
-              <Route path="Messages" element={<SendMessage />} />
               <Route path="MessageList" element={<MessageList />} />
               <Route path="MyProfile" element={<MyProfile />} />
             </Route>
