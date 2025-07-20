@@ -23,7 +23,7 @@ import ApproveStudents from './components/pages/Admin/ApproveStudents';
 import TeacherDashboard from './components/pages/Teacher/TeacherDashboard';
 import ScheduleAppointment from './components/pages/teacher/ScheduleAppointment';
 import AppointmentList from './components/pages/teacher/AppointmentList';
-import MessageList from './components/pages/teacher/MessageList';
+import ViewAllMessages from './components/pages/teacher/ViewAllMessages';
 import AvailabilityList from './components/pages/teacher/AvailabilityList';
 import TeacherProfile from './components/pages/teacher/TeacherProfile';
 
@@ -33,6 +33,8 @@ import SearchTeacher from './components/pages/Student/SearchTeacher';
 import BookAppointment from './components/pages/Student/BookAppointment';
 import MyAppointments from './components/pages/Student/MyAppointments';
 import SendMessage from './components/pages/student/SendMessage';
+import MyProfile from './components/pages/Student/MyProfile';
+import MessageList from './components/pages/Student/MessageList';
 
 // public pages & login/register imports...
 import PrivateRoute from './components/Auth/PrivateRoute';
@@ -69,9 +71,9 @@ function App() {
               }
             >
               <Route index element={<AdminDashboard />} />
-              <Route path="add-teacher" element={<AddTeacher />} />
-              <Route path="manage-teachers" element={<ManageTeachers />} />
-              <Route path="approve-students" element={<ApproveStudents />} />
+              <Route path="AddTeacher" element={<AddTeacher />} />
+              <Route path="ManageTeacher" element={<ManageTeachers />} />
+              <Route path="ApproveStudents" element={<ApproveStudents />} />
             </Route>
 
             {/* Teacher */}
@@ -86,7 +88,7 @@ function App() {
                 }
               >
               <Route index element={<TeacherDashboard />} />
-              <Route path="MessageList" element={<MessageList/>} />
+              <Route path="ViewAllMessages" element={<ViewAllMessages/>} />
               <Route path="ScheduleAppointment" element={<ScheduleAppointment />} />
               <Route path="AppointmentList" element={<AppointmentList />} />
               <Route path="availabilityList" element={<AvailabilityList />} />
@@ -105,10 +107,12 @@ function App() {
               }
             >
               <Route index element={<StudentDashboard />} />
-              <Route path="search-teachers" element={<SearchTeacher />} />
+              <Route path="SearchTeacher" element={<SearchTeacher />} />
               <Route path="book-appointment" element={<BookAppointment />} />
-              <Route path="my-appointments" element={<MyAppointments />} />
-              <Route path="send-message" element={<SendMessage />} />
+              <Route path="MyAppointments" element={<MyAppointments />} />
+              <Route path="Messages" element={<SendMessage />} />
+              <Route path="MessageList" element={<MessageList />} />
+              <Route path="MyProfile" element={<MyProfile />} />
             </Route>
 
 

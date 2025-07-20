@@ -16,7 +16,7 @@ export default function TeacherCard({ teacher, onViewDetails }) {
   return (
     <div className="bg-white rounded-xl shadow-md overflow-hidden border border-indigo-100 transition-all hover:shadow-lg">
       <div className="p-4 sm:p-5">
-        <div className="flex items-center mb-4 cursor-pointer" onClick={() => onViewDetails(teacher)}>
+        <div className="flex items-center mb-4 cursor-pointer" > {/* onClick={() => onViewDetails(teacher)}> */}
           <div className="bg-gradient-to-br from-indigo-200 to-blue-300 rounded-xl w-14 h-14 flex-shrink-0 flex items-center justify-center mr-4">
             {teacher.avatar ? (
               <img 

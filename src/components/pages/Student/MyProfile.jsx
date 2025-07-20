@@ -56,30 +56,33 @@ export default function MyProfile() {
               github: data.github || ''
             });
           } else {
+
+              console.log("No profile data found, creating default profile.");
+
             // Split display name for new users
-            const displayName = currentUser.displayName || 'John Doe';
-            const nameParts = displayName.split(' ');
-            const firstName = nameParts[0] || 'John';
-            const lastName = nameParts.slice(1).join(' ') || 'Doe';
+            // const displayName = currentUser.displayName || 'John Doe';
+            // const nameParts = displayName.split(' ');
+            // const firstName = nameParts[0] || 'John';
+            // const lastName = nameParts.slice(1).join(' ') || 'Doe';
             
-            const defaultData = {
-              firstName,
-              lastName,
-              email: currentUser.email || 'john.doe@university.edu',
-              phone: '+1 (555) 123-4567',
-              dob: '2000-01-15',
-              major: 'Computer Science',
-              year: 'Junior',
-              bio: 'Passionate computer science student with a focus on AI and machine learning. Currently working on research projects related to natural language processing.',
-              notifications: true,
-              newsletter: true,
-              website: 'https://johndoe.dev',
-              linkedin: 'linkedin.com/in/johndoe',
-              github: 'github.com/johndoe'
-            };
+            // const defaultData = {
+            //   firstName,
+            //   lastName,
+            //   email: currentUser.email || 'john.doe@university.edu',
+            //   phone: '+1 (555) 123-4567',
+            //   dob: '2000-01-15',
+            //   major: 'Computer Science',
+            //   year: 'Junior',
+            //   bio: 'Passionate computer science student with a focus on AI and machine learning. Currently working on research projects related to natural language processing.',
+            //   notifications: true,
+            //   newsletter: true,
+            //   website: 'https://johndoe.dev',
+            //   linkedin: 'linkedin.com/in/johndoe',
+            //   github: 'github.com/johndoe'
+            // };
             
-            setProfileData(defaultData);
-            await setDoc(studentRef, defaultData);
+            // setProfileData(defaultData);
+            // await setDoc(studentRef, defaultData);
           }
         } catch (error) {
           console.error("Error fetching profile: ", error);

@@ -26,13 +26,15 @@ export default function SendMessage({ teacher, onClose }) {
     try {
       await addDoc(collection(db, 'messages'), {
         studentId: currentUser.uid,
-        studentName: currentUser.displayName || currentUser.email || 'Unknown Student',
+        studentName: currentUser.displayName || 'Unknown Student',
+        studentEmail: currentUser.email || 'No email',
         teacherId: teacher.id,
         teacherName: teacher.teacherName || 'Unknown Teacher',
         message: message.trim(),
         createdAt: Timestamp.now(),
         read: false
       });
+      console.log('student name', studentName,  currentUser.name);
       
       setSuccess(true);
       setTimeout(() => {

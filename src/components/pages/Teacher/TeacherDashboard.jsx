@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { FaCalendarAlt, FaCheckCircle, FaEnvelope, FaListAlt, FaUser, FaSignOutAlt } from 'react-icons/fa';
 import ScheduleAppointment from './ScheduleAppointment';
 import AppointmentList from './AppointmentList';
-import MessageList from './MessageList';
+import ViewAllMessages from './ViewAllMessages';
 import AvailabilityList from './AvailabilityList';
 import TeacherProfile from './TeacherProfile';
 import { useAuth } from '../../../context/AuthContext';
@@ -24,7 +24,7 @@ export default function TeacherDashboard() {
     switch(activeTab) {
       case 'schedule': return <ScheduleAppointment />;
       case 'appointments': return <AppointmentList />;
-      case 'messages': return <MessageList />;
+      case 'messages': return <ViewAllMessages />;
       case 'availability': return <AvailabilityList />;
       case 'profile': return <TeacherProfile />;
       default: return <ScheduleAppointment />;

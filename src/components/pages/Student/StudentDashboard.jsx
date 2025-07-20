@@ -60,7 +60,7 @@ const StudentDashboard = () => {
   };
 
   return (
-    <div className="bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 mt-12 min-h-screen">
+    <div className="bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50  min-h-screen">
       {/* Header */}
       <header className="bg-gradient-to-l from-indigo-600 via-purple-600 to-pink-600 text-white shadow-lg">
         <div className="container mx-auto px-5 pl-15 py-3 md:py-4 flex justify-between items-center">

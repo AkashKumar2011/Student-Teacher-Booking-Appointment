@@ -200,7 +200,7 @@ const login = async (email, password, userRole) => {
 
     let role = userRole.toLowerCase();
     console.log('Role from login:', role);
-
+    
     let collectionName;
     if(role === 'admin' ){
        collectionName = 'admins'; // "admin"
@@ -273,6 +273,8 @@ const login = async (email, password, userRole) => {
     return unsubscribe;
   }, [getUserData]);
 
+
+  // console.log('AuthContext initialized with user:', currentUser, userData); 
   const value = {
     currentUser,
     userData,

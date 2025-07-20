@@ -23,7 +23,7 @@ import {
   FaExternalLinkAlt
 } from 'react-icons/fa';
 
-export default function MessageList() {
+export default function ViewAllMessages() {
   const { currentUser } = useAuth();
   const [messages, setMessages] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -365,7 +365,7 @@ export default function MessageList() {
                 {selectedMessage?.id === message.id && (
                   <div className="border-t border-gray-100 p-4 bg-gray-50">
                     <div className="mb-4 p-3 bg-white rounded-lg">
-                      <p className="text-gray-700">{message.content}</p>
+                      <p className="text-gray-700">{message.message}</p>
                     </div>
                     
                     <form onSubmit={handleReply}>
