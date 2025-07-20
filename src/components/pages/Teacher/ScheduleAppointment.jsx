@@ -5,7 +5,7 @@ import { db } from '../../../firebase/config';
 import { useAuth } from '../../../context/AuthContext';
 import { FaCalendarAlt, FaClock, FaPlus, FaInfoCircle } from 'react-icons/fa';
 
-export default function ScheduleAppointment() {
+export default function   () {
   const { currentUser } = useAuth();
   const [date, setDate] = useState('');
   const [startTime, setStartTime] = useState('');

@@ -20,7 +20,7 @@ import ManageTeachers from './components/pages/Admin/ManageTeachers';
 import ApproveStudents from './components/pages/Admin/ApproveStudents';
 
 // Teacher Pages
-import TeacherDashboard from './components/pages/Teacher/TeacherDashboard';
+import TeacherDashboard from './components/pages/teacher/TeacherDashboard';
 import ScheduleAppointment from './components/pages/teacher/ScheduleAppointment';
 import AppointmentList from './components/pages/teacher/AppointmentList';
 import ViewAllMessages from './components/pages/teacher/ViewAllMessages';
@@ -28,13 +28,13 @@ import AvailabilityList from './components/pages/teacher/AvailabilityList';
 import TeacherProfile from './components/pages/teacher/TeacherProfile';
 
 // Student Pages
-import StudentDashboard from './components/pages/Student/StudentDashboard';
-import SearchTeacher from './components/pages/Student/SearchTeacher';
-import BookAppointment from './components/pages/Student/BookAppointment';
-import MyAppointments from './components/pages/Student/MyAppointments';
-import SendMessage from './components/pages/student/SendMessage';
-import MyProfile from './components/pages/Student/MyProfile';
-import MessageList from './components/pages/Student/MessageList';
+import AppointmentList from './components/pages/student/AppointmentList';
+import BookAppointment from './components/pages/student/BookAppointment';
+import MessageList from './components/pages/student/MessageList';
+import MyAppointments from './components/pages/student/MyAppointments';
+import SearchTeacher from './components/pages/student/SearchTeacher';
+import MyProfile from './components/pages/student/MyProfile';
+import StudentDashboard from './components/pages/student/StudentDashboard';
 
 // public pages & login/register imports...
 import PrivateRoute from './components/Auth/PrivateRoute';
@@ -108,7 +108,8 @@ function App() {
             >
               <Route index element={<StudentDashboard />} />
               <Route path="SearchTeacher" element={<SearchTeacher />} />
-              <Route path="book-appointment" element={<BookAppointment />} />
+              <Route path="BookAppointment" element={<BookAppointment />} />
+              <Route path="AppointmentList" element={<AppointmentList />} />
               <Route path="MyAppointments" element={<MyAppointments />} />
               <Route path="Messages" element={<SendMessage />} />
               <Route path="MessageList" element={<MessageList />} />
