@@ -46,21 +46,21 @@ export default function MessageList() {
           q = query(
             collection(db, 'messages'),
             where('teacherId', '==', currentUser.uid),
-            orderBy('createdAt', 'desc')
+            // orderBy('createdAt', 'desc')
           );
         } else if (filter === 'read') {
           q = query(
             collection(db, 'messages'),
             where('teacherId', '==', currentUser.uid),
             where('read', '==', true),
-            orderBy('createdAt', 'desc')
+            // orderBy('createdAt', 'desc')
           );
         } else {
           q = query(
             collection(db, 'messages'),
             where('teacherId', '==', currentUser.uid),
             where('read', '==', false),
-            orderBy('createdAt', 'desc')
+            // orderBy('createdAt', 'desc')
           );
         }
         
